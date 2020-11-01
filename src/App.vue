@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <AppBar />
-    <v-main>
+    <v-main v-if="checkAccountFetched == true" > 
       <v-container  ><router-view></router-view></v-container>
     </v-main>
   </v-app>
@@ -21,11 +21,12 @@ export default {
   data: () => ({
     //
   }),
-  beforeMount() {
+  beforeCreate() {
       this.$store.dispatch("FetchAccounts")
-      this.$store.dispatch("FetchContractBalance")
-      this.$store.dispatch("FetchManager")
-      this.$store.dispatch("FetchPlayers")
+      
   },
+  computed:{
+    checkAccountFetched:function(){ return this.$store.getters.Accounts.length != 0 }
+  }
 };
 </script>

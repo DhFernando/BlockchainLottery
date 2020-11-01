@@ -1,6 +1,11 @@
 <template>
   <v-container>
     <v-row>
+      <v-col cols="12">
+        <h2> Round Num : {{ LotteryRound }}  </h2>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="6" >
         <v-row>
           <v-col cols="12">
@@ -34,13 +39,13 @@
           </v-col>
         </v-row>
       </v-col>
-       <v-col cols="6" >
+       <v-col cols="5" class="ml-5">
         <v-row>
           <v-col cols="12"> 
             <v-row v-show="Manager == this.$store.getters.Accounts[0]">
               <v-col cols="6">Manager Logged in</v-col>
               <v-col cols="6">
-                <v-btn v-show="Players.length > 0" color="primary" @click="pickWinner" >Pick Winner</v-btn>
+                <v-btn v-show="Players.length >= 6" color="primary" @click="pickWinner" >Pick Winner</v-btn>
               </v-col>
             </v-row>
             <v-row>
@@ -49,7 +54,7 @@
                   <v-text-field  v-model="bet" type="number" label="Enter Etherium mount"  required ></v-text-field>
                 </v-row>
                 <v-row>
-                    <v-btn v-if="bet >=0.2" color="success" @click="enter" >Enter to luck</v-btn>
+                    <v-btn v-if="bet >=0.2" color="success" @click="enter" >Enter to luck</v-btn> 
                 </v-row>
               </v-col>
             </v-row>
@@ -71,13 +76,20 @@ import lottery from '@/lottery'
     data: () => ({  
       bet : 0
     }),
+    mounted:function(){ 
+      this.$store.dispatch("FetchContractBalance")
+      this.$store.dispatch("FetchManager")
+      this.$store.dispatch("FetchPlayers")  
+      this.$store.dispatch("FetchLotteryRound")
+    },
     computed: {
         test:function(){ return window.web3.currentProvider },
         Manager:function() { return this.$store.getters.Manager },
         Players:function() { return this.$store.getters.Players },
         ContarctBalance:function() {
            return web3.utils.fromWei( this.$store.getters.ContarctBalance.toString()  , 'ether')
-        }
+        },
+        LotteryRound:function(){ return this.$store.getters.LotteryRound }
     },
     methods:{
       async enter(){
@@ -96,6 +108,8 @@ import lottery from '@/lottery'
         await lottery.methods.pickWinner().send({
           from : this.$store.getters.Accounts[0]
         })
+
+        
         this.$store.dispatch("FetchPlayers")
         this.$store.dispatch("FetchContractBalance")
       }
