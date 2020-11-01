@@ -5,7 +5,8 @@ const state = {
     Accounts : [],
     ContarctBalance : 0,
     Manager:null,
-    Players:[]
+    Players:[],
+    LotteryRound:null
   };
 
   const getters = {
@@ -13,6 +14,8 @@ const state = {
     ContarctBalance:(state) => { return state.ContarctBalance },
     Manager:(state) => { return state.Manager },
     Players:(state) => { return state.Players },
+    LotteryRound:(state) => { return state.LotteryRound },
+
   };
   
   const actions = {
@@ -27,13 +30,25 @@ const state = {
     },
 
     FetchManager:async(contex) =>{
-      const man = await lottery.methods.getManager().call()
+      let man = null
+        try{
+          man = await lottery.methods.getManager().call({from : state.Accounts[0]})
+        }catch{
+          man = "something went worng"
+        }
       contex.commit('setManagers' , man )
     },
 
     FetchPlayers:async(contex) =>{
-      const plyers = await lottery.methods.getPlayers().call()
+      let plyers = null   
+      plyers = await lottery.methods.getPlayers().call({from : state.Accounts[0]})  
       contex.commit('setPlayers' , plyers )
+    },
+
+    FetchLotteryRound:async(contex) =>{
+      let lotteryRound = null   
+      lotteryRound = await lottery.methods.getLotteryRound().call({from : state.Accounts[0]})  
+      contex.commit('setLotteryRound' , lotteryRound )
     },
 
   };
@@ -54,6 +69,10 @@ const state = {
 
     setPlayers: (state, plyers )=>{
       state.Players = plyers
+    },
+
+    setLotteryRound: (state, lotteryRound )=>{
+      state.LotteryRound = lotteryRound
     },
 
   };
